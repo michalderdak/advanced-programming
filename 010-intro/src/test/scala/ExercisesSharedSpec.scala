@@ -380,4 +380,133 @@ class ExercisesSharedSpec (M :ExercisesInterface) extends
     }
   }
 
+  "Exercise 18 (foldLeft1). We only check if the function behavior is correct. You need to double check yourself that you are NOT using reverse, using foldRight, and NOT using recursion." - {
+
+    withClue ("The test simply checks if foldLeft1 behaves like foldLeft") {
+
+      "check a sequence of subtractions against foldLeft" in {
+        forAll ("l") { (l:List[Int]) =>
+          forAll (Gen.choose(-50000,50000) -> "z") { (z: Int) =>
+            M.foldLeft1 (l,z) {_-_} should equal (scalaList(l).foldLeft (z) {_-_})
+          }
+        }
+      }
+
+      "check if the order of evaluations is the same" in {
+        forAll ("l") { (l:List[Int]) =>
+          scalaList(M.foldLeft1[Int,List[Int]] (l,Nil) { case (z,n) => Cons(n,z) }) should
+          equal (scalaList(l).foldLeft[scala.collection.immutable.List[Int]] (scalaList(Nil)) { case (z,n)=>n::z } )
+        }
+      }
+    }
+  }
+
+  "Exercise 19 (concat)" - {
+    "Check behavior against the standard library of Scala" in {
+      forAll ("l") { (l: List[List[Int]]) =>
+        val l_scala = scalaList(l)  map { scalaList _ }
+        scalaList(M.concat (l)) should equal (l_scala.flatten)
+      }
+    }
+  }
+
+  "Exercise 20 (filter)." - {
+    "Check behavior against the standard library of Scala" in {
+      val even: Int => Boolean = x => x % 2 == 0
+      forAll ("l") { (l: List[Int]) =>
+        scalaList(M.filter (l) (even)) should equal (scalaList(l) filter even)
+      }
+    }
+  }
+
+  "Exericse 21 (flatMap)" - {
+    "the test case from the text of the exercise flatMap (List(1,2,3)) { i => List(i,i) }" in {
+      M.flatMap (List(1,2,3)) {i => List(i,i)} should equal (List(1,1,2,2,3,3))
+    }
+
+    "flatMap with identity is concat" in {
+      forAll ("l") { (l: List[List[Int]]) =>
+        M.flatMap (l) {x => x} should equal (M concat l)
+      }
+    }
+  }
+
+  "Exercise 22 (filter1)" - {
+    "we check if filter and filter1 are equivalent. You have to manually check if you are using flatMap, NO recursion, NO fold, NO patter matching, and NO filter" in {
+      val p: Int => Boolean = x => x % 3 == 1
+      forAll ("l") { (l: List[Int]) =>
+        M.filter1 (l) (p) should equal (M.filter (l) (p))
+      }
+    }
+  }
+
+  "Exercise 23 (add)" - {
+    "the test case from the exercise " in {
+      M.add (List(1,2,3)) (List(4,5,6,7)) should equal (List(5,7,9))
+    }
+  }
+
+  "Exercise 24 (zipWith)" - {
+    "zipWith plus is add" in {
+      forAll ("l","r") { (l: List[Int], r: List[Int]) =>
+        M.zipWith[Int,Int,Int] {_+_} (l, r) should equal (M.add (l) (r))
+      }
+    }
+
+    "zipWith {_-_} (l) (l) gives a list of zeros of the same length as l" in {
+      forAll (nonEmptyIntList -> "l") { (l: List[Int]) =>
+        val lz = M.zipWith[Int,Int,Int] { _ - _ } (l,l)
+        scalaList(lz) should contain only 0
+        M length lz should equal (M length l)
+      }
+      M.zipWith[Int,Int,Int] { _-_ } (Nil,Nil) should equal (Nil)
+    }
+  }
+
+  "Exercise 25 (hasSubsequence)" - {
+
+    "test cases from the exercise" in {
+      val l = List(1,2,3,4)
+
+      M.hasSubsequence (l, List(1,2)) shouldBe true
+      M.hasSubsequence (l, List(2,3)) shouldBe true
+      M.hasSubsequence (l, List(4)) shouldBe true
+    }
+
+    "empty list have no Nil subsequence" in {
+      forAll (nonEmptyIntList -> "l") { (l: List[Int]) =>
+        M.hasSubsequence (Nil, l) shouldBe false
+      }
+    }
+
+    "Nil is a subsequence of every list" in {
+      forAll ("l") { (l: List[Int]) =>
+        M.hasSubsequence (l,Nil) shouldBe true
+      }
+    }
+
+    "concatenation introduces a subsequence" in {
+      forAll ("l1", "l2") { (l1: List[Int], l2: List[Int]) =>
+        M.hasSubsequence (M.concat (List(l1,l2)), l2) shouldBe true
+        M.hasSubsequence (M.concat (List(l1,l2)), l1) shouldBe true
+        M.hasSubsequence (M.concat (List(l1,l2,l1)), l2) shouldBe true
+      }
+    }
+  }
+
+  "Exercise 26 (pascal)" - {
+
+    "test cases from the exercise text" in {
+
+      M.pascal (1) should equal (List (1))
+      M.pascal (2) should equal (List (1,1))
+      M.pascal (3) should equal (List (1,2,1))
+      M.pascal (4) should equal (List (1,3,3,1))
+
+    }
+
+  }
+
+  // a test: pascal (4) = Cons(1,Cons(3,Cons(3,Cons(1,Nil))))
+
 }

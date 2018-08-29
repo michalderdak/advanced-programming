@@ -104,43 +104,41 @@ object Exercises extends App with ExercisesInterface {
 
   def foldLeft1[A,B] (as: List[A], z: B) (f: (B,A) => B): B = ???
 
-  // Exercise 11
+  // Exercise 19
 
   def append[A](a1: List[A], a2: List[A]): List[A] = a1 match {
     case Nil => a2
     case Cons(h,t) => Cons(h, append(t, a2))
   }
 
-  // def concat[A] (as: List[List[A]]) :List[A] = ..
+  def concat[A] (as: List[List[A]]): List[A] = ???
 
-  // Exercise 12
+  // Exercise 20
 
-  // def filter[A] (as: List[A]) (f: A => Boolean) : List[A] = ...
+  def filter[A] (as: List[A]) (f: A => Boolean): List[A] = ???
 
-  // Exercise 13
+  // Exercise 21
 
-  // def flatMap[A,B](as: List[A])(f: A => List[B]) : List[B] = ...
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = ???
 
-  // Exercise 14
+  // Exercise 22
 
-  // def filter1[A] (l: List[A]) (p: A => Boolean) :List[A] = ...
+  def filter1[A] (l: List[A]) (p: A => Boolean) :List[A] = ???
 
-  // Exercise 15
+  // Exercise 23
 
-  // def add (l: List[Int]) (r: List[Int]): List[Int] = ...
+  def add (l: List[Int]) (r: List[Int]): List[Int] = ???
 
-  // Exercise 16
+  // Exercise 24
 
-  // def zipWith[A,B,C] (f : (A,B)=>C) (l: List[A], r: List[B]) : List[C] = ...
+  def zipWith[A,B,C] (f: (A,B)=>C) (l: List[A], r: List[B]): List[C] = ???
 
-  // Exercise 17
+  // Exercise 25
 
-  // def hasSubsequence[A] (sup: List[A], sub: List[A]) :Boolean = ...
+  def hasSubsequence[A] (sup: List[A], sub: List[A]): Boolean = ???
 
-  // Exercise 18
+  // Exercise 26
 
-  // def pascal (n :Int) : List[Int] = ...
-
-  // a test: pascal (4) = Cons(1,Cons(3,Cons(3,Cons(1,Nil))))
+  def pascal (n: Int): List[Int] = ???
 
 }
