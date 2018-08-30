@@ -1,6 +1,6 @@
 name := "ADPRO 010-intro"
 
-version := "0.01"
+version := "0.02"
 
 scalaVersion := "2.12.6"
 

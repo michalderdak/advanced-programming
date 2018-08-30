@@ -56,4 +56,19 @@ trait ExercisesInterface {
 
   def foldLeft1[A,B] (as: List[A], z: B) (f: (B,A) => B): B
 
+  def concat[A] (as: List[List[A]]): List[A]
+
+  def filter[A] (as: List[A]) (f: A => Boolean): List[A]
+
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B]
+
+  def filter1[A] (l: List[A]) (p: A => Boolean): List[A]
+
+  def add (l: List[Int]) (r: List[Int]): List[Int]
+
+  def zipWith[A,B,C] (f: (A,B)=>C) (l: List[A], r: List[B]): List[C]
+
+  def hasSubsequence[A] (sup: List[A], sub: List[A]): Boolean
+
+  def pascal (n: Int): List[Int]
 }
