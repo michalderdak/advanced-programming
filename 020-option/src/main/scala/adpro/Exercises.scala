@@ -71,7 +71,7 @@ object Tree {
 
   def maximum1[A] (t: Tree[Int]): Int = ???
 
-  def map1[A,B] (t: Tree[Int]) (f: A=>B): Int = ???
+  def map1[A,B] (t: Tree[A]) (f: A=>B): Tree[B] = ???
 
 }
 
