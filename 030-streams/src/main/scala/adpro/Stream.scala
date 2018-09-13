@@ -45,68 +45,60 @@ sealed trait Stream[+A] {
       // of ||)
     }
 
-  //def find (p :A => Boolean) :Option[A] = this.filter (p).headOption
 
-  //exo2
-
+  //Exercise 2
   def toList: List[A] = ???
 
-  //exo3
+  //Exercise 3
   def take(n: Int): Stream[A] = ???
 
   def drop(n: Int): Stream[A] = ???
   
-  //exo4
-
+  //Exercise 4
   def takeWhile(p: A => Boolean): Stream[A] = ???
 
 
-  //exo5
-
+  //Exercise 5
   def forAll(p: A => Boolean): Boolean = ???
 
 
-  //exo6
-
+  //Exercise 6
   def takeWhile2(p: A => Boolean): Stream[A] = ???
 
-  //exo7
+  //Exercise 7
   def headOption2 () :Option[A] = ??? 
 
-  //exo8 The types of these functions are omitted as they are a part of the exercises
+  //Exercise 8 The types of these functions are omitted as they are a part of the exercises
   def map = ???
   def filter = ???
   def  append = ??? 
   def  flatMap = ???
 
-  //exo09
+  //Exercise 09
+  //Put your answer here:
 
+  //Exercise 10
+  //Put your answer here:
 
-  //exo10
-
-  //exo11
+  //Exercise 11
   def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = ???
 
 
-  //exo12
-
+  //Exercise 12
   def fib2  = ???
   def from2 = ???
 
-  //exo13
-
+  //Exercise 13
   def map2= ???
   def take2 = ???
   def takeWhile2 = ???
   def zipWith2 = ???
-
 
 }
 
 
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: ()=>A, t: ()=>Stream[A]) extends Stream[A]
-
 
 object Stream {
 
@@ -126,8 +118,7 @@ object Stream {
     //         use a generic function API of Seq
 
 
-  //ex1
-
+  //Exercise 1
   def from(n:Int):Stream[Int]=cons(n,from(n+1))
 
   def to(n:Int):Stream[Int]= cons(n,from(n-1))
@@ -137,4 +128,3 @@ object Stream {
 
 }
 
-// vim:tw=0:cc=80:nowrap
