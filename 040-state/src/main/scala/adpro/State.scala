@@ -86,9 +86,9 @@ object RNG {
   def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] =
     map2(ra, rb)((_, _))
 
-  val randIntDouble: Rand[(Int, Double)] = both(int, double)
+  lazy val randIntDouble: Rand[(Int, Double)] = both(int, double)
 
-  val randDoubleInt: Rand[(Double, Int)] = both(double, int)
+  lazy val randDoubleInt: Rand[(Double, Int)] = both(double, int)
 
   // Exercise 7 (6.7)
 
