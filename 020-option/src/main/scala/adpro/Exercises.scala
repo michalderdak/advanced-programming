@@ -34,9 +34,14 @@ package adpro
 trait OrderedPoint extends scala.math.Ordered[java.awt.Point] {
 
   this: java.awt.Point =>
+  
+  override def compare (that: java.awt.Point): Int =  {
+    if (this.x < that.x || this.x == that.x && this.y < that.y) {
+      return this.x - that.x + this.y - that.y
+    }
 
-  override def compare (that: java.awt.Point): Int =  ???
-
+    return that.x - this.x + that.y - this.y
+  }
 }
 
 // Try the following (and similar) tests in the repl (sbt console):
@@ -47,31 +52,52 @@ trait OrderedPoint extends scala.math.Ordered[java.awt.Point] {
 // Chapter 3
 
 
-sealed trait Tree[+A]
+sealed trait Tree[+A] 
 case class Leaf[A] (value: A) extends Tree[A]
 case class Branch[A] (left: Tree[A], right: Tree[A]) extends Tree[A]
 
+
 object Tree {
 
-  def size[A] (t :Tree[A]): Int = ???
+  // Exercise 2 (3.25)
+
+  def size[A] (t :Tree[A]): Int = t match {
+    case b: Branch[A] => 1 + size(b.left) + size(b.right)
+    case l: Leaf[A] => 1
+  }
 
   // Exercise 3 (3.26)
 
-  def maximum (t: Tree[Int]): Int = ???
+  def maximum (t: Tree[Int]): Int = t match {
+    case b: Branch[Int] => maximum(b.left) max maximum(b.right)
+    case l: Leaf[Int] => l.value
+  }
 
   // Exercise 4 (3.28)
 
-  def map[A,B] (t: Tree[A]) (f: A => B): Tree[B] = ???
+  def map[A,B] (t: Tree[A]) (f: A => B): Tree[B] = t match {
+    case b: Branch[A] =>  Branch(map(b.left)(f), map(b.right)(f))
+    case l: Leaf[A] => Leaf(f(l.value))
+  }
 
   // Exercise 5 (3.29)
 
-  def fold[A,B] (t: Tree[A]) (f: (B,B) => B) (g: A => B): B = ???
+  def fold[A,B] (t: Tree[A]) (f: (B,B) => B) (g: A => B): B = t match {
+    case b: Branch[A] => f(fold(b.left)(f)(g), fold(b.right)(f)(g))
+    case l: Leaf[A] => g(l.value)
+  }
 
-  def size1[A] (t: Tree[A]): Int = ???
+  def size1[A] (t: Tree[A]): Int = {
+    fold(t)((l: Int, r: Int) => 1 + l + r)(v => 1)
+  }
 
-  def maximum1[A] (t: Tree[Int]): Int = ???
+  def maximum1[A] (t: Tree[Int]): Int = {
+    fold(t)((l: Int, r: Int) => l max r)(v => v)
+  }
 
-  def map1[A,B] (t: Tree[A]) (f: A=>B): Tree[B] = ???
+  def map1[A,B] (t: Tree[A]) (f: A=>B): Tree[B] = {
+    fold(t)((l: Tree[B], r: Tree[B]) => Branch(l, r): Tree[B])((v: A) => Leaf(f(v)): Tree[B])
+  }
 
 }
 
@@ -79,7 +105,10 @@ sealed trait Option[+A] {
 
   // Exercise 6 (4.1)
 
-  def map[B] (f: A=>B): Option[B] = ???
+  def map[B] (f: A=>B): Option[B] = this match {
+    case None => None
+    case Some(a) => Some(f(a))
+  }
 
   // You may Ignore the arrow in default's type below for the time being.
   // (it should work (almost) as if it was not there)
@@ -87,11 +116,20 @@ sealed trait Option[+A] {
   // So it is not evaluated in case of Some (the term is 'call-by-name' and we
   // should talk about this soon).
 
-  def getOrElse[B >: A] (default: => B): B = ???
+  def getOrElse[B >: A] (default: => B): B = this match {
+    case None => default
+    case Some(a) => a
+  }
 
-  def flatMap[B] (f: A=>Option[B]): Option[B] = ???
+  def flatMap[B] (f: A=>Option[B]): Option[B] = this match {
+    case None => None
+    case Some(a) => f(a)
+  }
 
-  def filter (p: A => Boolean): Option[A] = ???
+  def filter (f: A => Boolean): Option[A] = this match {
+    case None => None
+    case Some(a) => if(f(a)) Some(a) else None
+  }
 
 }
 
@@ -108,18 +146,46 @@ object ExercisesOption {
 
   // Exercise 7 (4.2)
 
-  def variance (xs: Seq[Double]): Option[Double] = ???
+  def variance (xs: Seq[Double]): Option[Double] = {
+    mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
+  }
 
   // Exercise 8 (4.3)
 
-  def map2[A,B,C] (ao: Option[A], bo: Option[B]) (f: (A,B) => C): Option[C] = ???
+  def map2[A,B,C] (ao: Option[A], bo: Option[B]) (f: (A,B) => C): Option[C] = {
+    for {
+      a <- ao.map(x => x)
+      b <- bo.map(x => x)
+    } yield f(a, b)
+  }
 
   // Exercise 9 (4.4)
 
-  def sequence[A] (aos: List[Option[A]]): Option[List[A]] = ???
+  def sequence[A] (aos: List[Option[A]]): Option[List[A]] = {
+    // alternative one liner we were able to create but we didn't like as much as for yield
+    // aos.foldRight[Option[List[A]]](Some(Nil))((oa, ob) => map2(oa, ob)(_ :: _))
+    aos.foldRight[Option[List[A]]] (Some(Nil)) {
+      (x, y) => {
+        for {
+          a <- x.map(x => x)
+          b <- y.map(x => x)
+        } yield a :: b
+      }
+    }
+  }
 
   // Exercise 10 (4.5)
 
-  def traverse[A,B] (as: List[A]) (f :A => Option[B]): Option[List[B]] = ???
-
+  def traverse[A,B] (as: List[A]) (f :A => Option[B]): Option[List[B]] = {
+    // alternative one liner we were able to create but we didn't like as much as for yield
+    // as.foldRight[Option[List[B]]](Some(Nil))((x, y) => map2(f(x), y)(_ :: _))
+    as.foldRight[Option[List[B]]] (Some(Nil)) {
+      (x, y) => {
+        for {
+          a <- f(x).map(x => x)
+          b <- y.map(x => x)
+        } yield a :: b
+      }
+    }
+  }
 }

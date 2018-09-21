@@ -31,28 +31,57 @@ object Exercises extends App with ExercisesInterface {
 
   // add @annotation.tailrec to make the compiler check that your solution is
   // tail recursive
-  def fib (n: Int) : Int = ???
+  def fib (n: Int) : Int = {
+    fibSum(n - 1, 0, 1)
+  }
+
+  @annotation.tailrec
+  def fibSum (n: Int, a: Int, b: Int) : Int = n match {
+    case 0 => a
+    case n => fibSum(n - 1, b, a + b)
+  }
 
   // Exercise 4
 
   // add @annotation.tailrec to make the compiler check that your solution is
   // tail recursive
-  def isSorted[A] (as: Array[A], ordered: (A,A) =>  Boolean) :Boolean = ???
+  def isSorted[A] (as: Array[A], ordered: (A,A) => Boolean) : Boolean = {
+    @annotation.tailrec
+    def sort[A](i: Int) : Boolean = {
+        if(i >= as.length - 1) {
+          true
+        }
+        else {
+          ordered(as(i), as(i + 1)) && sort(i + 1)
+        }
+    }
+
+    sort(0)
+  }
+
+  
 
   // Exercise 5
 
-  def curry[A,B,C] (f: (A,B)=>C): A => (B => C) = ???
+  def curry[A,B,C] (f: (A,B)=>C): A => (B => C) = {
+    (a: A) => (b: B) => f(a, b)
+  }
 
   // Exercise 6
 
-  def uncurry[A,B,C] (f: A => B => C): (A,B) => C = ???
+  def uncurry[A,B,C] (f: A => B => C): (A,B) => C = {
+    (a: A, b: B) => f(a)(b)
+  }
 
   // Exercise 7
 
-  def compose[A,B,C] (f: B => C, g: A => B) : A => C = ???
+  def compose[A,B,C] (f: B => C, g: A => B) : A => C = {
+    (a: A) => f(g(a))
+  }
 
   // Exercise 8 requires no programming
-
+  // Result is 15 => case Cons(h, t) => h + sum(t)
+  
   // Exercise 9
 
   def tail[A] (as: List[A]) :List[A] = ???
