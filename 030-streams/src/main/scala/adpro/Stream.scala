@@ -63,17 +63,18 @@ sealed trait Stream[+A] {
 
   //Exercise 3
   def take(n: Int): Stream[A] = {
-    def loop(n: Int, stream: Stream[A]): Stream[A] = stream match
-    {
-      case Cons(head, tail) // "head" & "tail" = "this.head" & "this.tail"
-        if (n > 1) => {
-        cons(head(), loop(n - 1, stream.tail)) // stream.tail = rest of the stream
+    def loop(counter: Int, stream: Stream[A]): Stream[A] = stream match {
+      case Cons(head, _) => { // head == this.head
+        if (counter > 1) {
+          cons(head(), loop(counter - 1, stream.tail))
+        }
+        else if (counter == 1) {
+          cons(head(), empty)
+        }
+        else {
+          empty
+        }
       }
-      case Cons(head, _)
-        if (n == 1) => {
-        cons(head(), empty)
-      }
-      case _ => empty
     }
     loop(n, this)
   }
@@ -95,8 +96,23 @@ sealed trait Stream[+A] {
 
 
   //Exercise 5
-  def forAll(p: A => Boolean): Boolean = ???
+  def forAll(p: A => Boolean): Boolean = {
+    def loop(stream: Stream[A]): Boolean = {
+      if (stream.headOption() != None) {
+        if (p(stream.headOption().head)) {
+          loop(stream.tail)
+        }
+        else {
+          false
+        }
+      }
+      else {
+        true
+      }
+    }
 
+    loop(this)
+  }
 
   //Exercise 6
   def takeWhile2(p: A => Boolean): Stream[A] = ???
