@@ -115,7 +115,16 @@ sealed trait Stream[+A] {
   }
 
   //Exercise 6
-  def takeWhile2(p: A => Boolean): Stream[A] = ???
+  def takeWhile2(p: A => Boolean): Stream[A] = {
+    this.foldRight(empty[A])((head, tail) => {
+      if (p(head)) {
+        cons(head, tail)
+      }
+      else {
+        empty
+      }
+    })
+  }
 
   //Exercise 7
   def headOption2 () :Option[A] = ??? 
