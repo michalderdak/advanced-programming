@@ -81,4 +81,32 @@ class Stream_test extends FunSuite {
 	test("Exercise 7 test 5"){
 		assert(naturals.headOption2().contains(0))
 	}
+  
+  test("Exercise 8 map") {
+    val l = naturals.map(_ * 2).drop(30).take(3).toList
+    
+    assert(l(0) == 60)
+    assert(l(1) == 62)
+    assert(l(2) == 64)
+  }
+
+  test("Exercise 8 filter") {
+    val l = naturals.drop(10).filter(_ % 2 == 0).take(10).toList
+
+    assert(l(0) == 10)
+    assert(l(1) == 12)
+    assert(l(2) == 14)
+    assert(l(3) == 16)
+    assert(l(4) == 18)
+    assert(l(5) == 20)
+  }
+
+  test("Exercise 8 append") {
+    naturals.append (naturals)
+    val l = naturals.take(1)
+    val l2 = naturals.take(1).append(l).toList
+    
+    assert(l2(0) == 0)
+    assert(l2(1) == 0)
+  }
 }

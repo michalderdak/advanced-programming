@@ -132,11 +132,20 @@ sealed trait Stream[+A] {
   def headOption2 () :Option[A] = {
     foldRight(None: Option[A])((h, t) => Some(h))
   } 
-  
+
   //Exercise 8 The types of these functions are omitted as they are a part of the exercises
-  def map = ???
-  def filter = ???
-  def  append = ??? 
+  def map[B](f: A => B): Stream[B] = {
+    foldRight(empty[B])((h, t) => cons(f(h), t))
+  }
+
+  def filter(f: A => Boolean): Stream[A] = {
+    foldRight(empty[A])((h, t) => if(f(h)) cons(h, t) else t)
+  }
+
+  def append[B>:A] (s: Stream[B]): Stream[B] = {
+    foldRight(s)((h, t) => cons(h, t))
+  }
+  
   def  flatMap = ???
 
   //Exercise 09
