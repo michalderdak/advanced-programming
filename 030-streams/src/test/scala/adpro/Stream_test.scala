@@ -55,6 +55,11 @@ class Stream_test extends FunSuite {
 			//assert(l2.toList(2) == 5)
   }
 	
-
+  test ("Exercise 4") {
+      val l = naturals.takeWhile(_<1000000000).drop(100).take(3)
+      assert(l.headOption().contains(100))
+      assert(l.tail.headOption().contains(101))
+      assert(l.tail.tail.headOption().contains(102))
+    }
 
 }

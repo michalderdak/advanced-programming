@@ -92,8 +92,10 @@ sealed trait Stream[+A] {
   }
   
   //Exercise 4
-  def takeWhile(p: A => Boolean): Stream[A] = ???
-
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Cons(h, t) if(p(h())) => cons(h(), t().takeWhile(p))
+    case _ => empty
+  }
 
   //Exercise 5
   def forAll(p: A => Boolean): Boolean = {
