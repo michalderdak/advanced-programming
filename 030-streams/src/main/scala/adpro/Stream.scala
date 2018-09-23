@@ -62,7 +62,21 @@ sealed trait Stream[+A] {
   }
 
   //Exercise 3
-  def take(n: Int): Stream[A] = ???
+  def take(n: Int): Stream[A] = {
+    def loop(n: Int, stream: Stream[A]): Stream[A] = stream match
+    {
+      case Cons(head, tail) // "head" & "tail" = "this.head" & "this.tail"
+        if (n > 1) => {
+        cons(head(), loop(n - 1, stream.tail)) // stream.tail = rest of the stream
+      }
+      case Cons(head, _)
+        if (n == 1) => {
+        cons(head(), empty)
+      }
+      case _ => empty
+    }
+    loop(n, this)
+  }
 
   def drop(n: Int): Stream[A] = ???
   
