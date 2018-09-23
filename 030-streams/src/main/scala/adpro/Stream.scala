@@ -47,7 +47,19 @@ sealed trait Stream[+A] {
 
 
   //Exercise 2
-  def toList: List[A] = ???
+  def toList: List[A] = {
+    def loop(stream: Stream[A], listToReturn: List[A]): List[A] = {
+      if (stream.headOption() != None) {
+        val updatedList = listToReturn :+ stream.headOption().head //:+ returns a new list with added element
+        loop(stream.tail, updatedList) //Tail is the rest of the list.
+      }
+      else {
+        listToReturn
+      }
+    }
+
+    loop(this, List())
+  }
 
   //Exercise 3
   def take(n: Int): Stream[A] = ???
