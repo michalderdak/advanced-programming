@@ -78,7 +78,17 @@ sealed trait Stream[+A] {
     loop(n, this)
   }
 
-  def drop(n: Int): Stream[A] = ???
+  def drop(n: Int): Stream[A] = {
+    def loop(counter: Int, stream: Stream[A]): Stream[A] = {
+      if (counter < n) {
+        loop(counter + 1, stream.tail) // We skip by only passing the tail
+      }
+      else
+        stream // We return the rest of the stream
+    }
+
+    loop(0, this)
+  }
   
   //Exercise 4
   def takeWhile(p: A => Boolean): Stream[A] = ???
