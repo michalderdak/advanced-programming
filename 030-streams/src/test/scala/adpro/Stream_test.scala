@@ -62,4 +62,23 @@ class Stream_test extends FunSuite {
       assert(l.tail.tail.headOption().contains(102))
     }
 
+  test("Exercise 7 test 1") {
+    assert(from(3).headOption2().contains(3));
+  }
+
+  test("Exercise 7 test 2") {
+    assert(from(3).tail.headOption2().contains(4));
+  }
+
+	test("Exercise 7 test 3") {
+    assert(to(3).headOption2().contains(3));
+  }
+  
+	test("Exercise 7 test 4") {
+    assert(to(3).tail.headOption2().contains(2));
+  }
+
+	test("Exercise 7 test 5"){
+		assert(naturals.headOption2().contains(0))
+	}
 }

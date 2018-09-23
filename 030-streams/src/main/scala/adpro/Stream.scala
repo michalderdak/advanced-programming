@@ -129,8 +129,10 @@ sealed trait Stream[+A] {
   }
 
   //Exercise 7
-  def headOption2 () :Option[A] = ??? 
-
+  def headOption2 () :Option[A] = {
+    foldRight(None: Option[A])((h, t) => Some(h))
+  } 
+  
   //Exercise 8 The types of these functions are omitted as they are a part of the exercises
   def map = ???
   def filter = ???
