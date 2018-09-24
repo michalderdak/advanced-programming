@@ -81,7 +81,7 @@ class Stream_test extends FunSuite {
 	test("Exercise 7 test 5"){
 		assert(naturals.headOption2().contains(0))
 	}
-  
+
   test("Exercise 8 map") {
     val l = naturals.map(_ * 2).drop(30).take(3).toList
     
@@ -108,5 +108,13 @@ class Stream_test extends FunSuite {
     
     assert(l2(0) == 0)
     assert(l2(1) == 0)
+  }
+
+  test("Exercise 8 flatMap") {
+    val l = naturals.flatMap(x => from(x + 1)).take(3).toList
+    
+    assert(l(0) == 1)
+    assert(l(1) == 2)
+    assert(l(2) == 3)
   }
 }

@@ -142,11 +142,13 @@ sealed trait Stream[+A] {
     foldRight(empty[A])((h, t) => if(f(h)) cons(h, t) else t)
   }
 
-  def append[B>:A] (s: Stream[B]): Stream[B] = {
+  def append[B>:A] (s: => Stream[B]): Stream[B] = {
     foldRight(s)((h, t) => cons(h, t))
   }
   
-  def  flatMap = ???
+  def flatMap[B] (f: A => Stream[B]): Stream[B] = {
+    foldRight(empty[B])((h, t) => f(h).append(t))
+  }
 
   //Exercise 09
   //Put your answer here:
