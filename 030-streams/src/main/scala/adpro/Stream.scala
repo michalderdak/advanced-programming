@@ -151,7 +151,12 @@ sealed trait Stream[+A] {
   }
 
   //Exercise 09
-  //Put your answer here:
+  // def find(p: A => Boolean): Option[A] = { 
+  //  this.filter(p).headOption
+  // }
+  // Put your answer here: As streams are lazy and computed only when needed as oppose to lists, 
+  // the filter function won't iterate through the whole collection, but only through elemets until 
+  // it finds first suitable element
 
   //Exercise 10
   //Put your answer here:
