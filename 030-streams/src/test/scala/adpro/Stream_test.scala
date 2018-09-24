@@ -119,7 +119,7 @@ class Stream_test extends FunSuite {
   }
 
   test("Exercise 10 fib") {
-    val l = naturals.fibs(0, 1).take(7).toList
+    val l = naturals.fibs().take(7).toList
 
     assert(l(0) == 0)
     assert(l(1) == 1)
@@ -136,5 +136,5 @@ class Stream_test extends FunSuite {
 
     assert(l == l2)
   }
-    
+
 }

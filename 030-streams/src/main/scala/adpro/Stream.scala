@@ -160,8 +160,12 @@ sealed trait Stream[+A] {
 
   //Exercise 10
   //Put your answer here:
-  def fibs(n1: Int, n2: Int): Stream[Int] = {
-    cons(n1, fibs(n2, n1 + n2))
+  def fibs(): Stream[Int] = {
+    def go(n1: Int, n2: Int): Stream[Int] = {
+      cons(n1, go(n2, n1 + n2))
+    }
+
+    go(0, 1)
   }
 
   //Exercise 11
