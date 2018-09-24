@@ -160,6 +160,9 @@ sealed trait Stream[+A] {
 
   //Exercise 10
   //Put your answer here:
+  def fibs(n1: Int, n2: Int): Stream[Int] = {
+    cons(n1, fibs(n2, n1 + n2))
+  }
 
   //Exercise 11
   def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = ???
