@@ -186,10 +186,35 @@ sealed trait Stream[+A] {
   }
 
   //Exercise 13
-  def map2= ???
-  def take2 = ???
-  def takeWhile2 = ???
-  def zipWith2 = ???
+  def map2[B](f: A => B): Stream[B] = {
+    unfold(this) {
+      case Cons(h,t) => Some((f(h()), t()))
+      case _ => None
+    } 
+  }
+
+  def take2(n: Int): Stream[A] = {
+    unfold(this){
+      case Cons(h, t) if (n > 1) => Some(h(), t().take2(n - 1))
+      case Cons(h, _) if (n == 1) => Some(h(), empty)
+      case _ => None
+    }
+
+  }
+  def takeWhile3(p: A => Boolean): Stream[A] = {
+    unfold(this) {
+      case Cons(h, t) if(p(h())) => Some(h(), t())
+      case _ => None
+    }
+  }
+
+  def zipWith2[B,C](s2: Stream[B])(f: (A,B) => C): Stream[C] = {
+    unfold((this, s2)) {
+      case (Cons(h1,t1), Cons(h2,t2)) =>
+        Some((f(h1(), h2()), (t1(), t2())))
+      case _ => None
+    }
+  }
 
 }
 
