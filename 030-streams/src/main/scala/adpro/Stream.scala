@@ -176,10 +176,14 @@ sealed trait Stream[+A] {
     }
   }
 
-
   //Exercise 12
-  def fib2  = ???
-  def from2 = ???
+  def fibs1(): Stream[Int] = {
+    unfold(0, 1){case (x, y) => Some(x, (y, x + y))}
+  }
+
+  def from1(n: Int): Stream[Int] = {
+    unfold(n)(n => Some(n, (n + 1)))
+  }
 
   //Exercise 13
   def map2= ???

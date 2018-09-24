@@ -137,4 +137,9 @@ class Stream_test extends FunSuite {
     assert(l == l2)
   }
 
+  test("Exercise 12") {
+    assert(from(1).take(1000000000).drop(41).take(10).toList == naturals.from1(1).take(1000000000).drop(41).take(10).toList)
+    assert(naturals.fibs1().take(100).toList == naturals.fibs().take(100).toList)
+  }
+
 }
