@@ -129,4 +129,12 @@ class Stream_test extends FunSuite {
     assert(l(5) == 5)
     assert(l(6) == 8)
   }
+
+  test("Exercise 11") {
+    val l = naturals.take(10).toList
+    val l2 = naturals.unfold[Int, Int](0)(x => if(x < 10) Some(x, x + 1) else None).toList
+
+    assert(l == l2)
+  }
+    
 }
