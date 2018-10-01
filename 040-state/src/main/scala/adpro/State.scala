@@ -110,7 +110,9 @@ object RNG {
   // Exercise 5 (CB 6.5) (Lazy is added so that the class does not fail
   // at load-time without your implementation).
 
-  lazy val _double: Rand[Double] = ???
+  def _double: Rand[Double] = {
+    map(nonNegativeInt)(n => n.toDouble / Int.MaxValue)
+  }
 
   // Exercise 6 (CB 6.6)
 
