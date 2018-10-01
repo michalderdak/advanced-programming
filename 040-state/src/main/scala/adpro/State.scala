@@ -72,7 +72,21 @@ object RNG {
 
   // Exercise 4 (CB 6.4)
 
-  def ints(count: Int) (rng: RNG) = ???
+  def ints(count: Int) (rng: RNG): (List[Int], RNG) = {
+
+    def helper(c: Int, list: List[Int], rng2: RNG): (List[Int], RNG) = c match {
+      case c if c > 1 => {
+        val random = nonNegativeInt(rng2)
+        helper(c - 1, random._1 :: list, random._2)
+      }
+      case c if c <= 1 => {
+        val random = nonNegativeInt(rng2)
+        (random._1 :: list, rng2)
+      }
+    }
+
+    helper(count, List(), rng)
+  }
 
   // There is something terribly repetitive about passing the RNG along
   // every time. What could we do to eliminate some of this duplication
