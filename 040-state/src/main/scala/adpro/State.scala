@@ -140,7 +140,9 @@ object RNG {
     fs.foldRight(unit(Nil: List[A]))((a, b) => map2(a, b)(_ :: _))
   }
 
-  def _ints(count: Int): Rand[List[Int]] = ???
+  def _ints(count: Int): Rand[List[Int]] = {
+    sequence(List.fill(count)(int))
+  }
 
   // Exercise 8 (6.8)
 
