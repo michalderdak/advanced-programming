@@ -34,11 +34,22 @@ object RNG {
 
   // Exercise 1 (CB 6.1)
 
-  def nonNegativeInt (rng: RNG): (Int, RNG) = ???
+  def nonNegativeInt (rng: RNG): (Int, RNG) = {
+    val random = rng.nextInt
+
+    if(random._1 < 0)
+      (random._1 * -1, random._2)
+    else
+      random
+  }
 
   // Exercise 2 (CB 6.2)
 
-  def double (rng: RNG): (Double, RNG) = ???
+  def double (rng: RNG): (Double, RNG) = {
+    val random = nonNegativeInt(rng)
+    
+    (random._1.toDouble / Int.MaxValue, random._2)
+  }
 
   // Exercise 3 (CB 6.3)
 
