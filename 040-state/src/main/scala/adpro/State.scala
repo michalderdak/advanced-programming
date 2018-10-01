@@ -136,7 +136,9 @@ object RNG {
 
   // Exercise 7 (6.7)
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = ???
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
+    fs.foldRight(unit(Nil: List[A]))((a, b) => map2(a, b)(_ :: _))
+  }
 
   def _ints(count: Int): Rand[List[Int]] = ???
 
