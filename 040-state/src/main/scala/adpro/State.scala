@@ -53,9 +53,19 @@ object RNG {
 
   // Exercise 3 (CB 6.3)
 
-  def intDouble (rng: RNG) = ???
+  def intDouble (rng: RNG): ((Int, Double), RNG)= {
+    val intRandom = nonNegativeInt(rng)
+    val doubleRandom = double(intRandom._2)
+    
+    ((intRandom._1, doubleRandom._1), doubleRandom._2)
+  }
 
-  def doubleInt (rng: RNG) = ???
+  def doubleInt (rng: RNG): ((Double, Int), RNG) = {
+    val doubleRandom = double(rng)
+    val intRandom = nonNegativeInt(doubleRandom._2)
+    
+    ((doubleRandom._1, intRandom._1), intRandom._2)
+  }
 
   def boolean (rng: RNG): (Boolean, RNG) =
     rng.nextInt match { case (i,rng2) => (i%2==0,rng2) }
