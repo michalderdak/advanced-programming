@@ -171,12 +171,20 @@ case class State[S, +A](run: S => (A, S)) {
 
   // Exercise 9 (6.10)
 
-  def map[B](f: A => B): State[S, B] = ???
+  def map[B](f: A => B): State[S, B] = {
+    flatMap(a => unit(f(a)))
+  }
 
-  def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] = ???
+  def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] = {
+    flatMap(a => sb.map(b => f(a, b)))
+  }
 
-  def flatMap[B](f: A => State[S, B]): State[S, B] = ???
-
+  def flatMap[B](f: A => State[S, B]): State[S, B] = {
+    State(s => {
+      val (a, s1) = run(s)
+      f(a).run(s1)
+    })
+  }
 }
 
 object State {
@@ -187,7 +195,9 @@ object State {
 
   // Exercise 9 (6.10) continued
 
-  def sequence[S,A](sas: List[State[S, A]]): State[S, List[A]] = ???
+  def sequence[S,A](sas: List[State[S, A]]): State[S, List[A]] = {
+    sas.foldRight(unit[S, List[A]](List()))((f, acc) => f.map2(acc)(_ :: _))
+  }
 
   // This is given in the book:
 
@@ -204,12 +214,16 @@ object State {
 
   // Exercise 10
 
-  def state2stream[S,A] (s :State[S,A]) (seed :S) :Stream[A] = ???
+  def state2stream[S,A] (s :State[S,A]) (seed :S) :Stream[A] = {
+    s.run(seed) match { case (n, s1) => Stream.cons(n, state2stream(s)(s1)) }
+  }
 
   // Exercise 11 (lazy is added so that the class does not crash at load time
   // before you provide an implementation).
 
-  lazy val random_integers = ???
+  lazy val random_integers = {
+    state2stream(random_int)(RNG.SimpleRNG(1234567890))
+  }
 
 }
 
