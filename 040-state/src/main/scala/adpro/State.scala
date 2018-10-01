@@ -146,9 +146,22 @@ object RNG {
 
   // Exercise 8 (6.8)
 
-  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
+  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = {
+    rng => {
+      val (a, b) = f(rng)
+      g(a)(b)
+    }
+  }
 
-  def nonNegativeLessThan(n: Int): Rand[Int] = ???
+  def nonNegativeLessThan(n: Int): Rand[Int] = {
+    flatMap(nonNegativeInt)({
+      i => {
+        val mod = i % n
+        if (i + (n - 1) >= mod) unit(mod)
+        else nonNegativeLessThan(n)
+      }
+    })
+  }
 
 }
 
