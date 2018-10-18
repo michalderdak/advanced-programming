@@ -35,7 +35,9 @@ object Par {
 
   // Exercise 1 (CB7.4)
 
-  // def asyncF[A,B] (f: A => B) : A => Par[B] =
+  def asyncF[A,B] (f: A => B) : A => Par[B] = {
+    (a => lazyUnit(f(a)))
+  }
 
   // map is shown in the book
 
@@ -44,44 +46,94 @@ object Par {
 
   // Exercise 2 (CB7.5)
 
-  // def sequence[A] (ps: List[Par[A]]): Par[List[A]] = ...
+  def sequence[A] (ps: List[Par[A]]): Par[List[A]] = {
+    ps.foldRight(unit[List[A]](List()))((value, finalList) => map2(value, finalList)(_ :: _))
+  }
 
   // Exercise 3 (CB7.6)
 
   // this is shown in the book:
 
-  // def parMap[A,B](ps: List[A])(f: A => B): Par[List[B]] = fork {
-  //   val fbs: List[Par[B]] = ps.map(asyncF(f))
-  //   sequence(fbs)
-  // }
+  def parMap[A,B](ps: List[A])(f: A => B): Par[List[B]] = fork {
+    val fbs: List[Par[B]] = ps.map(asyncF(f))
+    sequence(fbs)
+  }
 
-  // def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] = ...
+  def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] = {
+    val parList: List[Par[List[A]]] = as.map(asyncF((a: A) => if(f(a)) List(a) else List()))
+    map(sequence(parList))(_.flatten)
+  }
 
   // Exercise 4: implement map3 using map2
 
-  // def map3[A,B,C,D] (pa :Par[A], pb: Par[B], pc: Par[C]) (f: (A,B,C) => D) :Par[D]  = ...
+  def map3[A,B,C,D] (pa :Par[A], pb: Par[B], pc: Par[C]) (f: (A,B,C) => D) :Par[D]  = {
+    def partialCurry(a: A, b: B)(c: C): D = f(a, b, c)
+    val pc2d: Par[C => D] = map2(pa, pb)((a, b) => partialCurry(a, b))
+    def applyFunc(func: C => D, c: C): D = func(c)
+    map2(pc2d, pc)((c2d, c) => applyFunc(c2d, c))
+    
+    // (es: ExecutorService) => {
+    //   val paf = pa(es)
+    //   val pbf = pb(es)
+    //   val pcf = pc(es)
+
+    //   UnitFuture(f(paf.get, pbf.get, pcf.get))
+    // }
+  }
 
   // shown in the book
 
-  // def equal[A](e: ExecutorService)(p: Par[A], p2: Par[A]): Boolean = p(e).get == p2(e).get
+  def equal[A](e: ExecutorService)(p: Par[A], p2: Par[A]): Boolean = p(e).get == p2(e).get
 
   // Exercise 5 (CB7.11)
 
-  // def choiceN[A] (n: Par[Int]) (choices: List[Par[A]]) :Par[A] =
+  def choiceN[A] (n: Par[Int]) (choices: List[Par[A]]) :Par[A] = {
+    (es: ExecutorService) => {
+      val place = n(es).get
+      val choice = choices(place)
+      run(es)(choice)
+    }
+  }
 
-  // def choice[A] (cond: Par[Boolean]) (t: Par[A], f: Par[A]) : Par[A] =
+  def choice[A] (cond: Par[Boolean]) (t: Par[A], f: Par[A]) : Par[A] = {
+    (es: ExecutorService) => {
+      val decision = cond(es).get
+      if(decision) t(es) else f(es)
+    }
+  }
 
   // Exercise 6 (CB7.13)
 
-  // def chooser[A,B] (pa: Par[A]) (choices: A => Par[B]): Par[B] =
+  def chooser[A,B] (pa: Par[A]) (choices: A => Par[B]): Par[B] = {
+    (es: ExecutorService) => {
+      val pav = pa(es).get
+      val parB = choices(pav)
+      parB(es)
+    }
+  }
 
-  // def choiceNviaChooser[A] (n: Par[Int]) (choices: List[Par[A]]) :Par[A] =
+  def choiceNviaChooser[A] (n: Par[Int]) (choices: List[Par[A]]): Par[A] = {
+    (es: ExecutorService) => {
+      val choice = chooser(n)(i => choices(i))
+      choice(es)
+    }
+  }
 
-  // def choiceViaChooser[A] (cond: Par[Boolean]) (t: Par[A], f: Par[A]) : Par[A] =
+  def choiceViaChooser[A] (cond: Par[Boolean]) (t: Par[A], f: Par[A]) : Par[A] = {
+    (es: ExecutorService) => {
+      val choice = chooser(cond)(cond => if(cond) t else f)
+      choice(es)
+    }
+  }
 
   // Exercise 7 (CB7.14)
 
-  // def join[A] (a : Par[Par[A]]) :Par[A] =
+  def join[A] (a: Par[Par[A]]): Par[A] = {
+    (es: ExecutorService) => {
+      val result = a(es).get
+      result(es)
+    }
+  }
 
   class ParOps[A](p: Par[A]) {
 

@@ -142,31 +142,79 @@ sealed trait Stream[+A] {
     foldRight(empty[A])((h, t) => if(f(h)) cons(h, t) else t)
   }
 
-  def append[B>:A] (s: Stream[B]): Stream[B] = {
+  def append[B>:A] (s: => Stream[B]): Stream[B] = {
     foldRight(s)((h, t) => cons(h, t))
   }
   
-  def  flatMap = ???
+  def flatMap[B] (f: A => Stream[B]): Stream[B] = {
+    foldRight(empty[B])((h, t) => f(h).append(t))
+  }
 
   //Exercise 09
-  //Put your answer here:
+  // def find(p: A => Boolean): Option[A] = { 
+  //  this.filter(p).headOption
+  // }
+  // Put your answer here: As streams are lazy and computed only when needed as oppose to lists, 
+  // the filter function won't iterate through the whole collection, but only through elemets until 
+  // it finds first suitable element
 
   //Exercise 10
   //Put your answer here:
+  def fibs(): Stream[Int] = {
+    def go(n1: Int, n2: Int): Stream[Int] = {
+      cons(n1, go(n2, n1 + n2))
+    }
+
+    go(0, 1)
+  }
 
   //Exercise 11
-  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = ???
-
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
+    f(z) match {
+      case Some((h, s)) => cons(h, unfold(s)(f))
+      case None => Empty
+    }
+  }
 
   //Exercise 12
-  def fib2  = ???
-  def from2 = ???
+  def fibs1(): Stream[Int] = {
+    unfold(0, 1){case (x, y) => Some(x, (y, x + y))}
+  }
+
+  def from1(n: Int): Stream[Int] = {
+    unfold(n)(n => Some(n, (n + 1)))
+  }
 
   //Exercise 13
-  def map2= ???
-  def take2 = ???
-  def takeWhile2 = ???
-  def zipWith2 = ???
+  def map2[B](f: A => B): Stream[B] = {
+    unfold(this) {
+      case Cons(h,t) => Some((f(h()), t()))
+      case _ => None
+    } 
+  }
+
+  def take2(n: Int): Stream[A] = {
+    unfold(this){
+      case Cons(h, t) if (n > 1) => Some(h(), t().take2(n - 1))
+      case Cons(h, _) if (n == 1) => Some(h(), empty)
+      case _ => None
+    }
+
+  }
+  def takeWhile3(p: A => Boolean): Stream[A] = {
+    unfold(this) {
+      case Cons(h, t) if(p(h())) => Some(h(), t())
+      case _ => None
+    }
+  }
+
+  def zipWith2[B,C](s2: Stream[B])(f: (A,B) => C): Stream[C] = {
+    unfold((this, s2)) {
+      case (Cons(h1,t1), Cons(h2,t2)) =>
+        Some((f(h1(), h2()), (t1(), t2())))
+      case _ => None
+    }
+  }
 
 }
 

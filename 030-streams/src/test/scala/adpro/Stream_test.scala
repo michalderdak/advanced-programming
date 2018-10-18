@@ -81,7 +81,7 @@ class Stream_test extends FunSuite {
 	test("Exercise 7 test 5"){
 		assert(naturals.headOption2().contains(0))
 	}
-  
+
   test("Exercise 8 map") {
     val l = naturals.map(_ * 2).drop(30).take(3).toList
     
@@ -109,4 +109,37 @@ class Stream_test extends FunSuite {
     assert(l2(0) == 0)
     assert(l2(1) == 0)
   }
+
+  test("Exercise 8 flatMap") {
+    val l = naturals.flatMap(x => from(x + 1)).take(3).toList
+    
+    assert(l(0) == 1)
+    assert(l(1) == 2)
+    assert(l(2) == 3)
+  }
+
+  test("Exercise 10 fib") {
+    val l = naturals.fibs().take(7).toList
+
+    assert(l(0) == 0)
+    assert(l(1) == 1)
+    assert(l(2) == 1)
+    assert(l(3) == 2)
+    assert(l(4) == 3)
+    assert(l(5) == 5)
+    assert(l(6) == 8)
+  }
+
+  test("Exercise 11") {
+    val l = naturals.take(10).toList
+    val l2 = naturals.unfold[Int, Int](0)(x => if(x < 10) Some(x, x + 1) else None).toList
+
+    assert(l == l2)
+  }
+
+  test("Exercise 12") {
+    assert(from(1).take(1000000000).drop(41).take(10).toList == naturals.from1(1).take(1000000000).drop(41).take(10).toList)
+    assert(naturals.fibs1().take(100).toList == naturals.fibs().take(100).toList)
+  }
+
 }
