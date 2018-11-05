@@ -78,13 +78,19 @@ trait Parsers[ParseError, Parser[+_]] { self =>
 
   // Exercise 1
 
-  // def manyA ...
+  def manyA (): Parser[Int] = {
+    char('a').many.slice.map(_.length)
+  }
 
   // Exercise 2
 
-  def map2[A,B,C] (p: Parser[A], p2: Parser[B]) (f: (A,B) => C): Parser[C] = ???
+  def map2[A,B,C] (p: Parser[A], p2: Parser[B]) (f: (A,B) => C): Parser[C] = {
+    map(p.product(p2))(f.tupled)
+  }
 
-  def many1[A] (p: Parser[A]): Parser[List[A]] = ???
+  def many1[A] (p: Parser[A]): Parser[List[A]] = {
+    map2(p, many(p))((a: A, la: List[A]) => a :: la) | succeed(List())
+  }
 
   // Exercise 3
 
