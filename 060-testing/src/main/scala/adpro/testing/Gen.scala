@@ -27,11 +27,15 @@ case class Gen[A] (sample :State[RNG,A]) {
 
   // Exercise 3
 
-  def listOfN (n: Int): Gen[List[A]] = ???
+  def listOfN (n: Int): Gen[List[A]] = {
+    Gen(State.sequence(List.fill(n)(sample)))
+  }
 
   // Exercise 4
 
-  def flatMap[B] (f: A => Gen[B]): Gen[B] = ???
+  def flatMap[B] (f: A => Gen[B]): Gen[B] = {
+    Gen(this.sample.flatMap(a => f(a).sample))
+  }
 
   // It would be convenient to also have map  (uses flatMap)
 
@@ -39,11 +43,15 @@ case class Gen[A] (sample :State[RNG,A]) {
 
   // Exercise 5
 
-  def listOfN (size: Gen[Int]): Gen[List[A]] = ???
+  def listOfN (size: Gen[Int]): Gen[List[A]] = {
+    size.flatMap(a => listOfN(a))
+  }
 
   // Exercise 6
 
-  def union (that: Gen[A]): Gen[A] = ???
+  def union (that: Gen[A]): Gen[A] = {
+    Gen.boolean.flatMap(coin => if(coin) this else that)
+  }
 
   // Exercise 7 continues in the companion object (below)
 }
@@ -63,15 +71,23 @@ object Gen {
 
   // Exercise 1
 
-  def choose (start: Int, stopExclusive: Int): Gen[Int] = ???
+  def choose (start: Int, stopExclusive: Int): Gen[Int] = {
+    Gen(State(RNG.nonNegativeInt).map(n => start + n % (stopExclusive-start)))
+  }
 
   // Exercise 2
 
-  def unit[A] (a: =>A): Gen[A] = ???
+  def unit[A] (a: =>A): Gen[A] = {
+    Gen(State(RNG.unit(a)))
+  }
 
-  def boolean: Gen[Boolean] = ???
+  def boolean: Gen[Boolean] = {
+    Gen(State(RNG.boolean))
+  }
 
-  def double: Gen[Double] = ???
+  def double: Gen[Double] = {
+    Gen(State(RNG.double))
+  }
 
   // (Exercise 3 is found in the Gen class above)
 
@@ -115,9 +131,20 @@ case class Prop (run: (TestCases,RNG)=>Result) {
 
   // (Exercise 7)
 
-  def && (that: Prop): Prop = Prop { ??? }
+  def && (that: Prop): Prop = Prop { 
+    (testCase, rng) => run(testCase, rng) match {
+      case Passed => that.run(testCase, rng)
+      case Proved => that.run(testCase, rng)
+      case Falsified(failure, successes) => Falsified(failure, successes)
+    }
+   }
 
-  def || (that: Prop): Prop = Prop { ??? }
+  def || (that: Prop): Prop = Prop { 
+    (testCase, rng) => run(testCase, rng) match {
+      case Falsified(failure, successes) => that.run(testCase, rng)
+      case anythingElse => anythingElse
+    }
+  }
 
 }
 
