@@ -144,6 +144,7 @@ object JSON {
     import P._
     val spaces = char(' ').many.slice
 
+    /* Exercise 6 */
     val jnull: Parser[JNull.type] = string("null").map(_ => JNull)
 
     val jbool: Parser[JBool] = regex("true|false".r).map(s => {
@@ -157,6 +158,13 @@ object JSON {
        char('"').flatMap(_ => regex("[^\"]*".r).flatMap(s => char('"').map(_ => JString(s))))
     }
 
-    ??? /* Exercise 6 */
+    // We think this JSON object can be parsed by our parser.
+    //    {
+    //      "NullValue":null
+    //      "BoolValue":true,
+    //      "StringValue":"I am a string",
+    //    }
+
+    succeed(JNull)
   }
 }
