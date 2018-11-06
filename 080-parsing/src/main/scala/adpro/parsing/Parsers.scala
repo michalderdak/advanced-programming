@@ -102,15 +102,20 @@ trait Parsers[ParseError, Parser[+ _]] {
 
   // Exercise 2
   def map2[A, B, C](p: Parser[A], p2: Parser[B])(f: (A, B) => C): Parser[C] = map(p.product(p2))(f.tupled)
+
   def many1[A](p: Parser[A]): Parser[List[A]] = map2(p, many(p))((a: A, la: List[A]) => a :: la) | succeed(List())
 
 
   // Exercise 3
-  def digitTimesA: Parser[String] = ???
+  def digitTimesA: Parser[Int] = regex("\\d".r).flatMap(i => {
+    val nr = i.toInt
+    listOfN(nr, char('a')).map(_ => nr)
+  })
 
   // Exercise 4
-  def product[A, B](p: Parser[A], p2: Parser[B]): Parser[(A, B)] = flatMap(p)(a => map(p2)(b => (a, b)))
-  def map2_flatMap[A, B, C](p: Parser[A], p2: Parser[B])(f: (A, B) => C): Parser[C] = flatMap(p)(a => map(p2)(b => f(a, b)))
+  def product[A, B](p: Parser[A], p2: Parser[B]): Parser[(A, B)] = flatMap(p)((a) => map(p2)((b) => (a, b)))
+
+  def map2_flatMap[A, B, C](p: Parser[A], p2: Parser[B])(f: (A, B) => C): Parser[C] = flatMap(p)((a) => map(p2)((b) => f(a, b)))
 
   // Exercise 5
   def map_flatMap[A, B](p: Parser[A])(f: A => B): Parser[B] = flatMap(p)(f.andThen(succeed))
