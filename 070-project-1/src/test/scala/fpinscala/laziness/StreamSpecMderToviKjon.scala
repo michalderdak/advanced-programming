@@ -8,9 +8,9 @@ import org.scalacheck.Prop._
 import Arbitrary.arbitrary
 import scala.util.Random
 
-import stream00._   
+//import stream00._   
 //import stream01._ 
-//import stream02._ 
+import stream02._ 
 
 class StreamSpecMderToviKjon extends FlatSpec with Checkers {
 
@@ -21,52 +21,55 @@ class StreamSpecMderToviKjon extends FlatSpec with Checkers {
   it should "return None on an empty Stream (01)" in {
     assert(empty.headOption == None)
   }
-  
-  it should "return the head of the stream packaged in Some (02)" in check {
-    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int])
-    ("singleton" |:
-      Prop.forAll { (n :Int) => cons (n,empty).headOption == Some (n) } ) &&
-    ("random" |:
-      Prop.forAll { (s :Stream[Int]) => s.headOption != None } )
-  }
 
-  it should "not force the taild of the stream" in check {
+  it should "return the head of the stream packaged in Some (02) " in check {
+    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int])
+       ("singleton" |:
+         Prop.forAll { (n :Int) => cons (n,empty).headOption == Some (n) } ) &&
+       ("random" |:
+         Prop.forAll { (s :Stream[Int]) => s.headOption != None } )
+    }
+
+  it should "not force the tail of the stream" in check {
     Prop.forAll {(n: Int) => 
       cons(n, throw new RuntimeException("forced tail")).headOption == Some(n)}
   }
  
   behavior of "take"
 
-  it should "should not force any heads nor any tails of the Stream" in {
-    assert(genExceptionStream("forced stream").take(10) != null)
+  it should "should not force any heads nor any tails of the Stream" in check {
+    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int])
+    Prop.forAll{(s: Stream[Int], n: Int) => if(n > 0) s.map(x => x / 0).take(n); true }
   }
+
+  it should "not force the n + 1 element even if we are force all elements of take(n)" in check { 
+    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int])
+     Prop.forAll{ (s :Stream[Int], n: Int, n1: Int, n2: Int) => cons(n1, cons(n2, cons(n, s.map(x => x / 0)))).take(3); true }
+   }
 
   it should "return empty on empty stream" in {
     forAll((n: Int) => empty.take(n) == empty)
   }
 
-  it should "s.take(n).take(n) == s.take(n) for any Stream s and any n" in check {
-    Prop.forAll(genNonEmptyStream[Int]){(s: Stream[Int]) => {
-        val N = 100
-        s.take(N).take(N).toList == s.take(N).toList
-      }}
-  }
+  it should "s.take(n).take(n) == s.take(n) for any Stream s and any n" in check { 
+    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int])
+     Prop.forAll{ (s :Stream[Int], n: Int) => (n > 0) ==> ((s.take(n)).take(n).toList equals (s.take(n)).toList) } 
+   }
 
   behavior of "drop"
 
   it should "s.drop(n).drop(m) == s.drop(n+m) for any n, m" in check{
-    val maxN = 100
+    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int]) 
+    (""|: Prop.forAll(from(0).take(100)) {(s: Stream[Int]) => {
+      val l1 = s.drop(10).drop(10).toList
+      val l2 = s.drop(20).toList
 
-    Prop.forAll(from(0).take(maxN)) {(s: Stream[Int]) => {
-      val m = Random.nextInt(maxN / 2)
-      val n = Random.nextInt(maxN / 2)
-
-      s.drop(m).drop(n).toList == s.drop(m + n).toList
-    }}
+      l1 == l2
+    }})
   }
 
   it should "not force any of the dropped elements heads or tail" in {
-    assert(genExceptionStream("forced stream").drop(10) != null)
+    assert(genExceptionStream("head was forced").drop(10) != null)
   }
 
   it should "return empty on empty stream" in {
@@ -76,36 +79,24 @@ class StreamSpecMderToviKjon extends FlatSpec with Checkers {
   behavior of "map"
 
   it should "not change the value if .map(x => x) is used" in check {
-    Prop.forAll(genNonEmptyStream[Int]) {(s: Stream[Int]) => {
-      s.map(x => x).toList == s.toList
-    }}
+    def infiniteStream :Stream[Int] = cons( 1, infiniteStream)
+      Prop.forAll {(n: Int) => infiniteStream.map(x => x) ; true }  
   }
 
   it should "terminates on infinite streams" in {
-    val value = from(0).map(x => x)
-    true
-  }
-
-  it should "not break on empty stream" in check {
-    Prop.forAll(empty[Int]) {(s: Stream[Int]) => {
-      s.map(x => 1).toList == s.toList
-    }}
+    from(0).map(x => x); true
   }
 
   behavior of "append"
 
-  it should "append stream to stream" in {
-    forAll((n: Int) => {
-      from(0).take(n).append(from(0).drop(n).take(n)).toList == from(0).take(n * 2)
-    })
+  it should "append stream to stream" in check {
+    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int])
+    Prop.forAll{(s1 :Stream[Int], s2 :Stream[Int]) => ((s1.toList).++(s2.toList)) == (s1.append(s2)).toList }
   }
 
-  // Additional functions tested
-
-  behavior of "toList"
-  
-  it should "return empty list on empty stream" in {
-    forAll((n: Int) => empty.take(n).toList == List())
+  it should "not force the tail stream" in check {
+    implicit def arbIntStream = Arbitrary[Stream[Int]] (genNonEmptyStream[Int])
+    Prop.forAll{(s1 :Stream[Int], s2 :Stream[Int]) => s1.append(s2.map(x => x / 0)); true}
   }
 
   // Helpers
