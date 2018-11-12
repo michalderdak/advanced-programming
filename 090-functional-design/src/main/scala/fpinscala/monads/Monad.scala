@@ -25,7 +25,9 @@ object Functor {
 
   // Exercise 10
 
-  // val OptionFunctor =
+  val OptionFunctor = new Functor[Option] {
+    def map[A,B] (o: Option[A]) (f: A => B): Option[B] = o.map(f)
+  }
 
 }
 
@@ -41,8 +43,10 @@ trait Monad[F[_]] {
     flatMap (ma) (a => map (mb) (b => f(a,b)))
 
   // Exercise 13 (CB11.3)
-
-  // def sequence[A] (lfa: List[F[A]]): F[List[A]] =
+  
+  def sequence[A] (lfa: List[F[A]]): F[List[A]] = {
+    lfa.foldRight(unit(List[A]()))((ma, mla) => map2(ma, mla)(_ :: _))
+  }
 
   // traverse seems to simply sequence results of mapping.  I do not think that
   // it appeared in our part. You can uncomment it once you have sequence.
@@ -50,15 +54,20 @@ trait Monad[F[_]] {
 
   // Exercise 14 (CB11.4)
 
-  // def replicateM[A] (n: Int, ma: F[A]): F[List[A]] =
+  def replicateM[A] (n: Int, ma: F[A]): F[List[A]] = n match {
+    case 0 => unit(List[A]())
+    case n => map2(ma, replicateM(n - 1, ma)) (_ :: _)
+  }
 
   def join[A] (mma: F[F[A]]): F[A] = flatMap (mma) (ma => ma)
 
   // Exercise 15 is solved in MonadSpec.scala
 
   // Exercise 16 (CB11.7)
-
-  // def compose[A,B,C] (f: A => F[B], g: B => F[C]): A => F[C] =
+  
+  def compose[A,B,C] (f: A => F[B], g: B => F[C]): A => F[C] = {
+    a => flatMap(f(a))(g)
+  }
 
 }
 
@@ -66,8 +75,14 @@ object Monad {
 
   // Exercise 12 (CB11.1)
 
-  // val optionMonad =
+  val optionMonad = new Monad[Option] {
+    def unit[A] (a: => A): Option[A] = Some(a)
+    def flatMap[A,B](ma: Option[A])(f: A => Option[B]) = ma.flatMap(f) 
+  }
 
-  // val listMonad =
+  val listMonad = new Monad[List] {
+    def unit[A] (a: => A): List[A] = List(a)
+    def flatMap[A, B] (ma: List[A]) (f: A => List[B]): List[B] = ma.flatMap(f)
+  }
 
 }

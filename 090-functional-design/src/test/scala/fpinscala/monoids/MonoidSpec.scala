@@ -30,27 +30,37 @@ object MonoidSpec extends Properties("Monoids..") {
   // Exercise 4: test intAddition, intMultiplication, booleanOr,
   // booleanAnd and optionMonoid.
 
-  // property ...
-  // property ...
-  // property ...
-  // property ...
-  // property ...
-  // property ...
+  property ("intAddition is a monoid") = monoid(intAddition)
+  property ("intMultiplication is a monoid") = monoid(intMultiplication)
+  property ("booleanOr is a monoid") = monoid(booleanOr)
+  property ("booleanAnd is a monoid") = monoid(booleanAnd)
+  property ("optionMonoid is a monoid") = monoid[Option[Int]](optionMonoid)
 
   // Exercise 5
 
-  // def homomorphism[A :Arbitrary,B :Arbitrary]
-  //  (ma: Monoid[A]) (f: A => B) (mb: Monoid[B]) =
+  def homomorphism[A :Arbitrary, B :Arbitrary] (ma: Monoid[A]) (f: A => B) (mb: Monoid[B]): Prop = {
+      forAll { (a: A, b: A) => mb.op(f(a), f(b)) == f(ma.op(a, b))} &&
+      (forAll { (a: A) => ma.op(a, ma.zero) == a } :| "right unit" &&
+      forAll { (a: A) => ma.op(ma.zero, a) == a } :| "left unit") &&
+      (forAll { (b: B) => mb.op(b, mb.zero) == b } :| "right unit" &&
+      forAll { (b: B) => mb.op(mb.zero, b) == b } :| "left unit")
+   }
 
-  // def isomorphism[A :Arbitrary, B :Arbitrary] ...
+   def isomorphism[A :Arbitrary, B :Arbitrary] (ma: Monoid[A]) (mb: Monoid[B]) (f: A => B) (g: B => A) : Prop = {
+     homomorphism(ma)(f)(mb) && homomorphism(mb)(g)(ma)
+   }
 
-  // property ("stringMonoid and listMonoid[Char] are isomorphic") = ...
+  property ("stringMonoid and listMonoid[Char] are isomorphic") = {
+    isomorphism[List[Char], String](listMonoid)(stringMonoid)((a: List[Char]) => a.mkString)((b: String) => b.toList)
+  }
 
   // Exercise 6
 
-  // property ("booleanOr and booleanAnd are isomorphic") =
+  property ("booleanOr and booleanAnd are isomorphic") = {
+    isomorphism[Boolean, Boolean](booleanOr)(booleanAnd)((a: Boolean) => !a)((b: Boolean) => !b)
+  }
 
   // Exercise 7 (the testing part)
 
-  // property ("productMonoid is a monoid") =
+  property ("productMonoid is a monoid") = monoid[(Option[Int], List[String])](productMonoid(optionMonoid, listMonoid))
 }
