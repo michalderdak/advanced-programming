@@ -1,3 +1,6 @@
+# The original file created by Anders  Fischer-Nielsen
+# Additions by Andrzej Wąsowski
+
 FROM java:latest 
 
 RUN apt-get update && apt-get install wget -s 
