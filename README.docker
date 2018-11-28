@@ -1,0 +1,18 @@
+The provided Dockerfile should only be used if you want to limit configuration
+problems.  If you face configuration issues and do not want to solve them
+yourself you can get a simple Linux system with sbt installed in which you can
+work by building this docker component.
+
+Especially Spark and Figaro (in the relevant weeks) might work better on Linux.
+
+1. Install docker
+
+2. In this directory: docker build ./  -t adpro
+
+3. docker run -t adpro sbt 
+
+(you can also run a shell and git to checkout repos, use a text editor, etc)
+
+
+
+
