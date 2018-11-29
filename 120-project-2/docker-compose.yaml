@@ -1,24 +1,24 @@
 version: '3.7'
 
 services:
-    spark:
-        build: .
-        command: ["sbt"]
+  spark:
+    build: .
+    command: ["sbt"]
 
-        volumes:
-            - type: bind
-              source: .
-              target: /root/mini-project-2
+    volumes:
+      - type: bind
+        source: .
+        target: /root/mini-project-2
 
-            - type: volume
-              source: sbt-deps
-              target: /root/.ivy2
+      - type: volume
+        source: sbt-deps
+        target: /root/.ivy2
 
-            - type: volume
-              source: sbt-bin
-              target: /root/.sbt
+      - type: volume
+        source: sbt-bin
+        target: /root/.sbt
 
-        working_dir: /root/mini-project-2
+    working_dir: /root/mini-project-2
 
 volumes:
   sbt-deps:
